@@ -179,7 +179,7 @@ class Spider:
     def run(self):
         # 隐藏卡号url
         # cardID 隐藏卡号 获取方法  https://zhuanlan.zhihu.com/p/65495172
-        content = ['621569***3079', 'BOC', '吕俊臻', '兴业银行 ', '2005091991097662286']
+        content = ['622848***2275', 'ABC', '冯家飞', '兴业银行 ', '2005181012388358356']
         _url = f'https://www.alipay.com/?appId=09999988&actionType=toCard&sourceId=bill&cardNo={content[0]}&' \
                f'bankAccount={content[2]}&money=&amount=&bankMark={content[1]}&bankName={content[3]}&cardIndex={content[4]}&cardNoHidden=true&cardChannel=HISTORY_CARD&orderSource=from'
 
