@@ -1,34 +1,13 @@
 ***********
 待办:
-1.百度短链充值  2020-05-16到期
-2.支付宝信用卡添加
 3.微信聊天记录下载
-
-
+5.途虎养车环境搭建
+7.跑分系统完善
+8.百度站长加个检查是否已经添加的功能，还有验证码验证失败重试
 
 
 ***************
-支付宝 信用卡 自动填写
+http://ejj.sdallinpay.com:37760/PayCenter/pay?mchid=166
 
 
-alipays://platformapi/startapp?appId=77700152&page=pages/card-creation/index?
-
-/index.html#pages/card-home/index
-
-com.eg.android.AlipayGphone
-.AlipayLogin
-
-
-alipays://platformapi/startapp?appId=09999999 信用卡页面
-
-
-
-https://ds.alipay.com/?from=mobilecodec&scheme=alipays%3A%2F%2Fplatformapi%2Fstartapp%3FappId%3D20000200%26actionType%3DtoCard
-
-https://ds.alipay.com/?from=mobilecodec&scheme=alipays://platformapi/startapp?appId=20000200&actionType=toCard&sourceId=bill&cardNo=6228480848862792670&bankAccount=田桂瑞
-&money=99999&amount=&bankMark=ABC&bankName=招商银行&cardNoHidden=true&cardChannel=HISTORY_CARD&orderSource=from
-
-
-
-
-# APPIUM 测试一下看看
+https://syb.allinpay.com/op?c=U9TXGAyT

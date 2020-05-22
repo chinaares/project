@@ -72,6 +72,9 @@ class Twitter:
         self.monitor = Monitor()
         self.monitor.run()
 
+        # 创建数据保存目录
+        os.mkdir(PATH + r'/数据')
+
         options = Options()
         # 使用无头模式
         # options.add_argument('headless')
@@ -117,13 +120,15 @@ class Twitter:
             cp.write(f)
 
     def red_csv(self):
-        """读取ID配置文件"""
-        with open('config/ID数据.csv', 'r', encoding='UTF-8-sig') as f:
+        """读取配置文件"""
+        file = f'{PATH}/config/输入文件.csv'
+        with open(file, 'r', encoding='UTF-8-sig') as f:
             reader = csv.reader(f)
             for row in reader:
                 if not row:
                     continue
-                yield row[0]
+                row = [i for i in row if str(i).replace(' ', '')]
+                yield row
 
     def keep_records(self, model_id, vali=False):
         """保存获取记录"""
@@ -226,11 +231,32 @@ class Twitter:
         # 删除转推账户信息
         os.remove('config/转推账户信息.txt')
 
+    def save_csv(self, data):
+        """
+        保存数据
+        :return:
+        """
+        path = PATH + r'/数据'  # 数据保存路径
+        if not os.path.exists(path):
+            os.mkdir(path)
+        FILE_NAME = f'{path}/twitter.csv'
+        with open(FILE_NAME, "a+", encoding='UTF-8', newline="") as f:
+            k = csv.writer(f, delimiter=',')
+            with open(FILE_NAME, "r", encoding='UTF-8', newline="") as f1:
+                reader = csv.reader(f1)
+                if not [row for row in reader]:
+                    k.writerow(
+                        ['No.', 'label', 'content', 'source', 'reply numbers', 'retweet numbers', 'likes numbers', 'filename'])
+                    k.writerows(data)
+                else:
+                    k.writerows(data)
+
     @run_time
     def main(self):
         self.login()
         log_init().info('Read ID data files...')
-        for url in self.red_csv():
+        for row in self.red_csv():
+            num, label, content, url = row
             # 判断是否获取过
             if self.keep_records(url, vali=True):
                 print(f'{url} jump over!')
@@ -243,13 +269,23 @@ class Twitter:
             except Exception as e:
                 log_init().error(e)
                 continue
-            print('获取转推数据')
+            finally:
+                # 写入记录文件
+                url = str(url).replace('\n', '')
+                retweet_count = self.red_ini('Version', 'retweet_count')
+                favorite_count = self.red_ini('Version', 'favorite_count')
+                reply_count = self.red_ini('Version', 'reply_count')
+                filename = f"retweet/{url.split('/')[-1]}.csv"
+                data = [[num, label, content, url, reply_count, retweet_count, favorite_count, filename]]
+                self.save_csv(data)
+
+                # 写入获取记录
+                self.keep_records(url)
+                log_init().info('Save acquisition records')
+
+            log_init().info('获取转推数据')
             self.retweeted_status(url)
             log_init().info(f'{url}Data acquisition completed!')
-
-            # 写入获取记录
-            self.keep_records(url)
-            log_init().info('Save acquisition records')
 
         self.driver.quit()
         # 关闭mitmduimp
@@ -283,9 +319,9 @@ class Monitor:
         os.system(mitmdump)
         os.system(cmd)
         log_init().info('Start mitmdump Server')
-        os.system('start /min mitmdump --mode upstream:https://127.0.0.1:8080 -s mitmdump_server.py')
+        os.system('start /min mitmdump --mode upstream:https://127.0.0.1:1080 -s mitmdump_server.py')
         time.sleep(5)
-        if not self.net_is_used(8080):
+        if not self.net_is_used(1080):
             log_init().info('mitmdump Service failed to start!')
             os._exit(0)
         log_init().info('mitmdump Service started successfully!')

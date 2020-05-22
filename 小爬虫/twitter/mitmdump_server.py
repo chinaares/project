@@ -49,6 +49,15 @@ def response(flow):
         for i in tweets:
             if red_ini('Version', 'id') == str(i) or str(i) == red_ini('Version', 'quoted_id'):
                 print(f'重复数据跳过:{i}')
+                # 转推数量
+                retweet_count = tweets[i].get('retweet_count')
+                # 点赞数量
+                favorite_count = tweets[i].get('favorite_count')
+                # 评论数量
+                reply_count = tweets[i].get('reply_count')
+                set_ini('Version', 'retweet_count', str(retweet_count))
+                set_ini('Version', 'favorite_count', str(favorite_count))
+                set_ini('Version', 'reply_count', str(reply_count))
                 continue
             # 推特ID
             screen_name = tweets[i].get('entities')
@@ -62,12 +71,12 @@ def response(flow):
             created_at = tweets[i].get('created_at')  # 时间
             full_text = tweets[i].get('full_text')  # 内容
             full_text = str(full_text).replace('\n', '')
-            retweet_count = tweets[i].get('retweet_count')  # 回复数量
+            # retweet_count = tweets[i].get('retweet_count')  # 回复数量
             # favorite_count = tweets[i].get('favorite_count')  # 转发信息
-            favorite_count = f'{ID[0]}转发数据.csv'  # 转发数据
-            reply_count = tweets[i].get('favorite_count')  # 点赞数
-            new_time = datetime.datetime.now()
-            data = [[ID_url, release_date, full_text, created_at, retweet_count, favorite_count, reply_count, new_time]]
+            # favorite_count = f'{ID[0]}转发数据.csv'  # 转发数据
+            # reply_count = tweets[i].get('favorite_count')  # 点赞数
+            # new_time = datetime.datetime.now()
+            data = [[ID_url, release_date, full_text, created_at]]
             sav_data(data, ID[0])
             # print('成功写入一条数据!')
 
@@ -138,7 +147,7 @@ def sav_data(data, name):
     保存数据
     :return:
     """
-    path = PATH + r'/数据'  # 数据保存路径
+    path = PATH + r'/数据/reply'  # 数据保存路径
     if not os.path.exists(path):
         os.mkdir(path)
     FILE_NAME = f'{path}/{name}.csv'
@@ -148,7 +157,7 @@ def sav_data(data, name):
             reader = csv.reader(f1)
             if not [row for row in reader]:
                 k.writerow(
-                    ['Twitter ID', '发布日期', '评论', '评论时间', '回复数', '转发数据文件', '点赞数', '获取数据时间'])
+                    ['Twitter ID', 'date', 'reply', 'reply date'])
                 k.writerows(data)
             else:
                 k.writerows(data)
@@ -159,10 +168,10 @@ def sav_retweete_time(data, name):
     保存数据
     :return:
     """
-    path = PATH + r'/数据'  # 数据保存路径
+    path = PATH + r'/数据/retweet'  # 数据保存路径
     if not os.path.exists(path):
         os.mkdir(path)
-    FILE_NAME = f'{path}/{name}转发数据.csv'
+    FILE_NAME = f'{path}/{name}.csv'
     with open(FILE_NAME, "a+", encoding='UTF-8', newline="") as f:
         k = csv.writer(f, delimiter=',')
         with open(FILE_NAME, "r", encoding='UTF-8', newline="") as f1:
