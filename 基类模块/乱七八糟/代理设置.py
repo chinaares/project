@@ -29,7 +29,7 @@ def get_ip_list(ip_url):
         ip_info = ips[i]
         try:
             tds = ip_info.find_all('td')
-            # 获取HTTPS IP
+            # 获取HTTPS ip
             if tds[5].text == 'HTTPS':
                 # 拼接IP:端口
                 ip_list.append(tds[1].text + ':' + tds[2].text)

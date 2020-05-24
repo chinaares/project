@@ -15,12 +15,12 @@ class DouYin(object):
         # rip = ip_address('0.0.0.0')
         # while rip.is_private:
         #     rip = ip_address('.'.join(map(str, (random.randint(0, 255) for _ in range(4)))))
-        #     self.headers['X-Real-IP'], self.headers['X-Forwarded-For'] = str(rip), str(rip)
+        #     self.headers['X-Real-ip'], self.headers['X-Forwarded-For'] = str(rip), str(rip)
 
         # while True:
         #     ip = ip_address('.'.join(map(str, (random.randint(0, 255) for _ in range(4)))))
         #     if ip.is_private:
-        #         self.headers['X-Real-IP'], self.headers['X-Forwarded-For'] = str(ip), str(ip)
+        #         self.headers['X-Real-ip'], self.headers['X-Forwarded-For'] = str(ip), str(ip)
         #         break
 
     def get_video_urls(self, user_id, type_flag='f'):

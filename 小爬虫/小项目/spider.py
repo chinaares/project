@@ -12,7 +12,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 """
 网站验证规则：
 1.ID
-2.IP
+2.ip
 """
 
 

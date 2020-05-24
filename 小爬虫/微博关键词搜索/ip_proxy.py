@@ -54,7 +54,7 @@ class Proxy:
             print(f'代理IP获取失败:\n错误代码：{content["code"]}\nmsg:{content["msg"]}')
             return
         print(content)
-        ip = content['data'][0]['ip']  # IP
+        ip = content['data'][0]['ip']  # ip
         port = content['data'][0]['port']  # 端口
         expire_time = content['data'][0]['expire_time']  # 过期时间
         # proxy = f'{ip}:{port}'
@@ -89,7 +89,7 @@ class Proxy:
             try:
                 self.censor_ip(ip_port)
             except:
-                print(f'代理IP验证失败，IP:{ip}不可用, 切换新IP!')
+                print(f'代理IP验证失败，ip:{ip}不可用, 切换新IP!')
                 i += 1
                 continue
 

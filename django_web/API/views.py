@@ -5,6 +5,7 @@ from .models import AntiFraud
 from .models import Alipay
 from django.shortcuts import render
 from django.http import HttpResponse
+from django.http import JsonResponse
 
 
 def upload(request):
@@ -67,7 +68,15 @@ def alipay(request, course):
 
 
 def ceshi(request):
-    return HttpResponse('测试页面')
+    if request.method == 'POST':
+        data = {'msg': '回调成功'}
+        a = str(request.body, encoding='utf-8')
+        with open('post.txt', 'a+', encoding='utf-8') as f:
+            f.write(a)
+            f.write('\n')
+
+        return JsonResponse(data)
+    return HttpResponse(f'测试页面:{request.GET}')
 
 
 def validity_period(request, course):

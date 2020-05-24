@@ -22,7 +22,7 @@ class douyin():
         while True:
             ip = ip_address('.'.join(map(str, (random.randint(0, 255) for _ in range(4)))))
             if ip.is_private:
-                self.headers['X-Real-IP'], self.headers['X-Forwarded-For'] = str(ip), str(ip)
+                self.headers['X-Real-ip'], self.headers['X-Forwarded-For'] = str(ip), str(ip)
                 break
         self.search_url = 'https://www.douyin.com/aweme/v1/aweme/favorite/?cursor=0&keyword={}&count=10&type=1&device_id={}&aid=1128&app_name=aweme&version_code=162&version_name=1.6.2'
         self.share_url = 'https://www.amemv.com/share/user/{}'
