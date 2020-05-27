@@ -1,0 +1,10 @@
+psutil==5.6.3
+pytesseract==0.2.9
+pandas==0.24.2
+selenium==3.141.0
+requests==2.22.0
+pytesseract==0.2.9
+opencv-python==4.1.0.25
+pillow==6.1.0
+xlrd==1.2.0
+openpyxl==2.6.3

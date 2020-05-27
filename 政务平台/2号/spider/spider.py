@@ -1,3 +1,9 @@
+# coding=utf-8
+# 作者    ： Administrator
+# 文件    ：批量添加子站.py
+# IED    ：PyCharm
+# 创建时间 ：2019/8/10 14:07
+# 更新记录 登录页面改版
 import os
 import sys
 import time
