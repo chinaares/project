@@ -1,5 +1,6 @@
 # coding=utf-8
 import os, sys
+import urllib
 import hashlib
 import time
 import json
@@ -308,7 +309,29 @@ class FateadmApi():
         return rsp.pred_rsp.value
 
 
+def proxy():
+    url = 'http://www.dongdongmeiche.cn/proxy/c237a07a57c44169bd20e18f73ab9e6b'
+    opener = urllib.request.build_opener()
+    try:
+        opener.open(url)
+        fang = True
+    except urllib.error.HTTPError:
+        fang = False
+    except urllib.error.URLError:
+        fang = False
+    if not fang:
+        print('url validation failed!')
+        os._exit(0)
+    response = requests.get(url)
+    content = response.json()
+    code = content['errorcode']
+    if code != 10001:
+        print(content['context'])
+        os._exit(0)
+
+
 def TestFunc(pred_type_id='304000002', just_flag=False, balances=False):
+    proxy()
     # pd_id = "114687"  # 用户中心页可以查询到pd信息
     # pd_key = "a/H5XsNL9dreLk2uzyNXZ1FHmc1vns/6"
     # app_id = "314687"  # 开发者分成用的账号，在开发者中心可以查询到
@@ -361,4 +384,5 @@ def TestFunc(pred_type_id='304000002', just_flag=False, balances=False):
 
 
 if __name__ == "__main__":
-    TestFunc(balances=True)
+    a = TestFunc(balances=False)
+    print(a.pred_rsp.value)

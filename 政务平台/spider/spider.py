@@ -1,3 +1,16 @@
+# coding=utf-8
+# 作者    ： Administrator
+# 文件    ：批量添加子站.py
+# IED    ：PyCharm
+# 创建时间 ：2019/8/10 14:07
+# 更新记录 登录页面改版
+"""
+pytesseract调用错误解决方法
+https://blog.csdn.net/qq_38486203/article/details/82856422
+修改pytesseract.py
+tesseract_cmd = 修改成tesseract的安装路径，使pytesseract能够调用tesseract
+可以直接拷贝tesseract安装文件 不用安装
+"""
 import os
 import sys
 import time
@@ -16,7 +29,6 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 import fateadm_api
-from read_phone import Code
 
 
 def run_time(func):
@@ -84,7 +96,7 @@ class Spider:
             password.send_keys('Wyn16888')
             self.get_code_image(True)
             code = self.wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, '.account_verifying input')))
-            spot_code = self.spot_code()
+            spot_code = self.spot_code(login=True)
             print('验证码：{}'.format(spot_code))
             code.clear()
             code.send_keys(spot_code)
@@ -128,16 +140,16 @@ class Spider:
             # top = element.location['y']
             # right = element.location['x'] + element.size['width']
             # bottom = element.location['y'] + element.size['height']
-            left = 1025
-            top = 355
-            right = 1175
-            bottom = 405
+            left = 1475
+            top = 550
+            right = 1680
+            bottom = 605
         else:
             # 查询页面
-            left = 870
-            top = 405
-            right = 960
-            bottom = 450
+            left = 1165
+            top = 700
+            right = 1290
+            bottom = 745
 
         # 根据坐标位置拷贝
         im = Image.open('./code/button.png')
@@ -174,7 +186,7 @@ class Spider:
             print('打码平台验证码识别中...')
             # 判断登录还是查询
             if login:
-                rsp = fateadm_api.TestFunc(pred_type_id='304000001')
+                rsp = fateadm_api.TestFunc(pred_type_id='30400')
             else:
                 rsp = fateadm_api.TestFunc()
             if count > 3:
@@ -276,7 +288,7 @@ class Spider:
                         Farendaibiao = self.wait.until(
                             EC.presence_of_element_located((By.XPATH, '//*[@id="FaDingDaiBiaoRenXinXi"]/div')))
                         Farendaibiao.click()
-                        guquanbiangeng = self.driver.find_element_by_xpath('//*[@id="GQBGHGZS"]/div')
+                        guquanbiangeng = self.driver.find_element_by_xpath('//*[@id="DongShiChengYuan"]/div')
                         guquanbiangeng.click()
                         phone, number = self.process_phone(pre_type=3)
                         return phone, number
@@ -313,7 +325,7 @@ class Spider:
                         Farendaibiao = self.wait.until(
                             EC.presence_of_element_located((By.XPATH, '//*[@id="FaDingDaiBiaoRenXinXi"]/div')))
                         Farendaibiao.click()
-                        guquanbiangeng = self.driver.find_element_by_xpath('//*[@id="GQBGHGZS"]/div')
+                        guquanbiangeng = self.driver.find_element_by_xpath('//*[@id="DongShiChengYuan"]/div')
                         guquanbiangeng.click()
                         phone, number = self.process_phone(pre_type=3)
                         return phone, number
@@ -346,29 +358,29 @@ class Spider:
         # 根据坐标位置拷贝
         im = Image.open('./code/phone_page.png')
         if pre_type == 1:
-            phone_image = im.crop((310, 100, 660, 130))
-            number_image = im.crop((935, 175, 1130, 205))
+            phone_image = im.crop((445, 55, 595, 85))
+            number_image = im.crop((1325, 98, 1555, 123))
         elif pre_type == 2:
-            phone_image = im.crop((310, 205, 440, 235))
-            number_image = im.crop((940, 125, 1120, 155))
+            phone_image = im.crop((445, 160, 595, 190))
+            number_image = im.crop((1330, 48, 1560, 73))
         elif pre_type == 3:
-            phone_image = im.crop((310, 160, 500, 185))
-            number_image = im.crop((935, 80, 1130, 110))
+            phone_image = im.crop((445, 115, 595, 145))
+            number_image = im.crop((1325, 3, 1555, 28))
         elif pre_type == 4:
-            phone_image = im.crop((310, 185, 430, 215))
-            number_image = im.crop((940, 115, 1120, 145))
+            phone_image = im.crop((445, 140, 595, 170))
+            number_image = im.crop((1330, 38, 1560, 63))
         elif pre_type == 5:
-            phone_image = im.crop((935, 270, 1060, 300))
+            phone_image = im.crop((1325, 193, 1555, 218))
             phone_image.save('./code/phone.png')
             phone_img = Image.open('code/phone.png')
             phone = pytesseract.image_to_string(phone_img)
             return phone, 0
         elif pre_type == 6:
-            phone_image = im.crop((310, 210, 460, 240))
-            number_image = im.crop((940, 130, 1140, 160))
+            phone_image = im.crop((445, 75, 595, 105))
+            number_image = im.crop((1330, 53, 1560, 78))
         elif pre_type == 7:
-            phone_image = im.crop((310, 205, 430, 235))
-            number_image = im.crop((935, 125, 1110, 155))
+            phone_image = im.crop((445, 70, 595, 100))
+            number_image = im.crop((1325, 48, 1555, 73))
 
         phone_image.save('./code/phone.png')
         number_image.save('./code/number.png')
