@@ -47,8 +47,8 @@ class Spider:
         # self.x = self.driver.get_window_size()['width']  # 宽
         # self.y = self.driver.get_window_size()['height']  # 长
         # print(self.x, self.y)
-        self.one = 'com.ss.android.ugc.aweme:id/a7n'  # 评论数量ID
-        self.two = 'com.ss.android.ugc.aweme:id/e1i'  # 评论数据模块ID
+        self.one = 'com.ss.android.ugc.aweme:id/a7h'  # 评论数量ID
+        self.two = 'com.ss.android.ugc.aweme:id/e06'  # 评论数据模块ID
 
     def slide(self):
         """
@@ -105,7 +105,7 @@ class Spider:
                         try:
                             con = WebDriverWait(self.driver, 5, 1, AttributeError).until(
                                 EC.presence_of_all_elements_located((By.XPATH,
-                                                                     '//android.support.v7.widget.RecyclerView [@resource-id="com.ss.android.ugc.aweme:id/e1i"]/android.widget.FrameLayout/android.widget.TextView')))
+                                                                     '//android.support.v7.widget.RecyclerView [@resource-id="com.ss.android.ugc.aweme:id/e06"]/android.widget.FrameLayout/android.widget.TextView')))
                             # print(con, len(con))
                             if con:
                                 print('到达底部,切换下一个视频')

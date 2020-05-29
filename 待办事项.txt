@@ -1,13 +1,14 @@
 ***********
 待办:
-3.微信聊天记录下载
-5.途虎养车环境搭建
-7.跑分系统完善
-8.百度站长加个检查是否已经添加的功能，还有验证码验证失败重试
-
+1.队长新增
+2.政企1号工时
+3.汽车之家口碑数据
+4.途虎养车轮胎数据
 
 ***************
-http://ejj.sdallinpay.com:37760/PayCenter/pay?mchid=166
+移动端 口碑
+https://koubei.app.autohome.com.cn/autov9.1.0/alibi/seriesalibiinfos-pm2-ss3170-st0-p112-s20-isstruct0-o0.json
 
 
-https://syb.allinpay.com/op?c=U9TXGAyT
+
+https://koubeiipv6.app.autohome.com.cn/autov9.13.0/alibi/NewEvaluationInfo.ashx?eid=3048899&cityid=110100&useCache=1
