@@ -1,9 +1,9 @@
 ***********
 待办:
-1.队长新增
-2.政企1号工时
-3.汽车之家口碑数据
-4.途虎养车轮胎数据
+1.队长新增  √
+2.政企1号工时  √
+3.汽车之家口碑数据  保存口碑详细信息
+4.途虎养车轮胎数据  √
 
 ***************
 移动端 口碑
@@ -12,3 +12,5 @@ https://koubei.app.autohome.com.cn/autov9.1.0/alibi/seriesalibiinfos-pm2-ss3170-
 
 
 https://koubeiipv6.app.autohome.com.cn/autov9.13.0/alibi/NewEvaluationInfo.ashx?eid=3048899&cityid=110100&useCache=1
+
+
