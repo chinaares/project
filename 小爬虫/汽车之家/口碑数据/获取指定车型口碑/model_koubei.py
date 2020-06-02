@@ -13,6 +13,7 @@ import datetime
 import requests
 from retrying import retry
 from multiprocessing import Pool
+from configparser import ConfigParser
 from fake_useragent import UserAgent
 
 
@@ -64,13 +65,17 @@ def log_init():
 class Spider:
     def __init__(self):
         # 口碑数据接口 ss:车系ID, p:页数, s:一页返回数据个数最多50
-        # st=0:缩略，1：满意，2：不满意，3：空间，4：动力，5：操控，6：油耗，7：舒适性，8：外观，9：内饰，10：性价比，11：满意度
-        # 12：电耗，13：店铺环境，14：-，15：性价比，16：
-        self.SeriesUrl = 'https://koubei.app.autohome.com.cn/autov9.1.0/alibi/seriesalibiinfos-pm2-ss3170-st0-p1-s50-isstruct0-o0.json'
+        self.SeriesUrl = 'https://koubei.app.autohome.com.cn/autov9.1.0/alibi/seriesalibiinfos-pm2-ss3170-st0-p112-s50-isstruct0-o0.json'
         # 口碑详细数据接口 eid=3052096 口碑详情页ID， self.SeriesUrl接口返回
         self.NewEvaluationUrl = 'https://koubeiipv6.app.autohome.com.cn/autov9.13.0/alibi/NewEvaluationInfo.ashx?eid='
-        # 评论
-        'https://koubeiipv6.app.autohome.com.cn/autov9.13.0/news/koubeicomments.ashx?pm=2&koubeiid=1936376&pagesize=20&lastid=0&hot=0'
+
+    def red_ini(self):
+        """读取ini配置文件"""
+        file = PATH + '\config.ini'  # 文件路径
+        cp = ConfigParser()  # 实例化
+        cp.read(file, encoding='utf-8')  # 读取文件
+        model = cp.get('Version', 'model')  # 读取数据
+        return model
 
     @retry(stop_max_attempt_number=30)
     def _parse_url(self, url):
@@ -85,22 +90,6 @@ class Spider:
                 continue
             return response
 
-    def get_model(self):
-        """获取所有车型数据"""
-        # 所有车型js文件
-        url = 'https://car.autohome.com.cn/javascript/NewSpecCompare.js?20131010'
-        response = self._parse_url(url)
-        content = response.content.decode('GBK')  # GBK解码
-        # 剔除开头和结尾处多余字符 转换为json
-        content = content.replace('var listCompare$100= ', '').replace(';', '')
-        content = json.loads(content)
-        # print(content)
-        for i in content:
-            for q in i['List']:
-                # 车系ID
-                for L in q['List']:
-                    yield L
-
     def get_eid(self, car):
         """获取车型口碑ID列表"""
         log_init().info(f'车系：{car} 口碑数据获取中...')
@@ -110,6 +99,7 @@ class Spider:
             try:
                 response = self._parse_url(url).json()
             except:
+                log_init().info(f'{url} 口碑数据解析失败!')
                 return
             koubeis = response.get('result').get('list')
             if not koubeis:
@@ -120,10 +110,10 @@ class Spider:
                 yield eid
             p += 1
 
-    def get_content(self, cars, eid):
+    def get_content(self, model, eid):
         """解析口碑详情数据"""
         url = f'{self.NewEvaluationUrl}{eid}'
-        log_init().info(f'车系：{cars} 口碑：{eid} 数据获取中...')
+        log_init().info(f'车系：{model} 口碑：{eid} 数据获取中...')
         response = self._parse_url(url).json()
         result = response.get('result')
         if not result:
@@ -153,13 +143,13 @@ class Spider:
         seriesname = result.get('seriesname')  # 车系名称
         boughtcityname = result.get('boughtcityname')  # 车系名称
 
-        data = [[userId, userName, cars, specid, brandname, seriesname, specname, boughtprovincename, boughtcityname, dealername,
+        data = [[userId, userName, model, specid, brandname, seriesname, specname, boughtprovincename, boughtcityname, dealername,
                  boughtdate, boughtPrice, actualOilConsumption, drivekilometer, spaceScene, powerScene,
                  maneuverabilityScene, oilScene, comfortablenessScene, apperanceScene, internalScene,
                  costefficientScene, purpose]]
         return data
 
-    def keep_records(self, car, vali=False):
+    def keep_records(self, eid, vali=False):
         """保存获取记录"""
         file_name = '获取记录.txt'
         if not os.path.exists(file_name):
@@ -168,12 +158,12 @@ class Spider:
         if vali:
             with open(file_name, 'r') as f:
                 flight = [i.replace('\n', '') for i in f.readlines()]
-                if str(car) in flight:
+                if str(eid) in flight:
                     return True
                 return False
         else:
             with open(file_name, 'a+') as f:
-                f.write(str(car))
+                f.write(str(eid))
                 f.write('\n')
 
     def scv_data(self, data):
@@ -190,40 +180,39 @@ class Spider:
                 else:
                     k.writerows(data)
 
-    def run(self, car):
+    def run(self, model, eid):
         # 判断是否获取
-        if self.keep_records(car, vali=True):
-            log_init().info(f'{car} 已获取跳过!')
+        if self.keep_records(eid, vali=True):
+            log_init().info(f'{eid} 已获取跳过!')
             return
-        # 第二步 获取口碑eid
-        for eid in self.get_eid(car):
-            # 第三步 获取口碑详情数据
-            data = self.get_content(car, eid)
-            # 第四步 保存数据
-            self.scv_data(data)
-            log_init().info(f'车系：{car} 口碑：{eid} 数据保存成功!')
-            time.sleep(1)
-        log_init().info(f'车系：{car} 口碑数据获取完成!')
+
+        # 第三步 获取口碑详情数据
+        data = self.get_content(model, eid)
+        # 第四步 保存数据
+        self.scv_data(data)
+        log_init().info(f'车系：{model} 口碑：{eid} 数据保存成功!')
         # 保存获取记录
-        self.keep_records(str(car))
-        log_init().info(f'车系：{car} 获取记录保存成功!')
+        self.keep_records(eid)
+        time.sleep(1)
 
     @run_time
     def main(self, num):
         """程序入口"""
         # 多线程启动
         pool = Pool(num)
-        for car in self.get_model():
+        # 第一步 读取车型ID
+        model = self.red_ini()
+        # 第二步 获取口碑eid
+        for eid in self.get_eid(model):
             # 启动线程
-            pool.apply_async(self.run, (car,))
+            pool.apply_async(self.run, (model, eid,))
 
         pool.close()
         pool.join()
+        log_init().info(f'车系：{model} 口碑数据获取完成!')
 
 
 if __name__ == '__main__':
     spider = Spider()
-    # spider.main(20)
-    for i in spider.get_model():
-        print(i)
+    spider.main(10)
 

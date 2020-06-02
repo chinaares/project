@@ -9,8 +9,7 @@
 移动端 口碑
 https://koubei.app.autohome.com.cn/autov9.1.0/alibi/seriesalibiinfos-pm2-ss3170-st0-p112-s20-isstruct0-o0.json
 
-
-
-https://koubeiipv6.app.autohome.com.cn/autov9.13.0/alibi/NewEvaluationInfo.ashx?eid=3048899&cityid=110100&useCache=1
+口碑详情数据
+https://koubeiipv6.app.autohome.com.cn/autov9.13.0/alibi/NewEvaluationInfo.ashx?eid=31140
 
 
