@@ -16,6 +16,7 @@ import sys
 import time
 import psutil
 import shutil
+import base64
 import pytesseract
 import pandas as pd
 from PIL import Image
@@ -65,6 +66,7 @@ class Spider:
         self.number = 0
         self.rsp = None
         self.count = 0
+        self.co = 0
 
     def login(self):
         """登录"""
@@ -97,7 +99,7 @@ class Spider:
             password.send_keys('Wyn16888')
             self.get_code_image(True)
             code = self.wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, '.account_verifying input')))
-            spot_code = self.spot_code()
+            spot_code = self.spot_code(login=True)
             print('验证码：{}'.format(spot_code))
             code.clear()
             code.send_keys(spot_code)
@@ -141,21 +143,31 @@ class Spider:
             # top = element.location['y']
             # right = element.location['x'] + element.size['width']
             # bottom = element.location['y'] + element.size['height']
-            left = 1390
-            top = 455
-            right = 1555
-            bottom = 510
+            # 登录页面 定位需要截图的元素
+            element = self.driver.find_element_by_xpath(
+                '//*[@id="app"]/div/div[2]/div[2]/div/div[2]/div[1]/div[2]/div[1]/div[1]/form/div[3]/div/div[2]/img')
+            img_data = element.get_attribute('src').split(',')[-1]
+            with open('./code/code.png', 'wb') as file:
+                img = base64.b64decode(img_data)
+                file.write(img)
         else:
             # 查询页面
+            # 截屏
+            # img = ImageGrab.grab()
+            # img.save('./code/button.png')
+            # 读取图片
+            im = Image.open('./code/button.png')
+            # 获取图片尺寸
+            # (width, height) = im.size
+            # 分辨率 1366 * 768
             left = 1160
-            top = 550
-            right = 1270
-            bottom = 590
+            top = 555
+            right = left + 115
+            bottom = top + 40
 
-        # 根据坐标位置拷贝
-        im = Image.open('./code/button.png')
-        im = im.crop((left, top, right, bottom))
-        im.save('./code/code.png')
+            # 根据坐标位置拷贝
+            im = im.crop((left, top, right, bottom))
+            im.save('./code/code.png')
 
     def spot_code(self, login=False, just_flag=False, balances=False):
         """
@@ -187,7 +199,7 @@ class Spider:
             print('打码平台验证码识别中...')
             # 判断登录还是查询
             if login:
-                rsp = fateadm_api.TestFunc(pred_type_id='304000001')
+                rsp = fateadm_api.TestFunc(pred_type_id='304000002')
             else:
                 rsp = fateadm_api.TestFunc()
             if count > 3:
@@ -208,6 +220,12 @@ class Spider:
         while True:
             if count > 3:
                 return '暂无数据', '暂无数据'
+            # 打码错误关闭程序
+            if self.co > 3:
+                print('打码错误请重试，或联系开发者。')
+                self.driver.close()
+                monitor = Monitor()
+                monitor.kill()
             # 填写请求信息
             self.driver.get('https://amr.sz.gov.cn/aicmerout/jsp/gcloud/giapout/industry/aicmer/processpage/step_one.jsp?ywType=30')
             num = self.wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, '#regno')))
@@ -217,7 +235,7 @@ class Spider:
             # 验证码识别
             self.get_code_image(False)
             code = self.wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, '#validCode')))
-            spot_code = self.spot_code(login=True)
+            spot_code = self.spot_code()
             print('验证码：{}'.format(spot_code))
             code.send_keys(spot_code)
             # code.send_keys(input('1.py'))
@@ -229,10 +247,11 @@ class Spider:
             try:
                 error_con = self.driver.find_element_by_xpath('//*[@class="layui-layer layui-layer-dialog  layer-anim"]/div[2]').text
                 print('错误信息：{}'.format(error_con))
-                if error_con == '验证码填写错误！':
+                if error_con == '图形验证码填写错误！':
                     # 退款
                     self.spot_code(just_flag=True)
                     count += 1
+                    self.co += 1
                     continue
                 elif error_con == '验证码失效！':
                     count += 1
@@ -262,7 +281,7 @@ class Spider:
                         return '暂无数据', '暂无数据'
                     co += 1
                     continue
-
+            self.co = 0  # 初始化打码错误计数
             # 提取数据
             print('数据加载中...')
             # time.sleep(5)

@@ -330,7 +330,7 @@ def proxy():
         os._exit(0)
 
 
-def TestFunc(pred_type_id='304000002', just_flag=False, balances=False):
+def TestFunc(pred_type_id='304000003', just_flag=False, balances=False):
     proxy()
     # pd_id = "114687"  # 用户中心页可以查询到pd信息
     # pd_key = "a/H5XsNL9dreLk2uzyNXZ1FHmc1vns/6"

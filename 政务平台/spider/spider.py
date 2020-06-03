@@ -11,14 +11,18 @@ https://blog.csdn.net/qq_38486203/article/details/82856422
 tesseract_cmd = 修改成tesseract的安装路径，使pytesseract能够调用tesseract
 可以直接拷贝tesseract安装文件 不用安装
 """
+"""
+分辨率 1280 * 720
+"""
 import os
 import sys
 import time
 import psutil
 import shutil
+import base64
 import pytesseract
 import pandas as pd
-from PIL import Image
+from PIL import Image, ImageGrab
 # from aip import AipOcr
 from datetime import datetime
 from selenium import webdriver
@@ -64,6 +68,7 @@ class Spider:
         self.number = 0
         self.rsp = None
         self.count = 0
+        self.co = 0
 
     def login(self):
         """登录"""
@@ -140,21 +145,35 @@ class Spider:
             # top = element.location['y']
             # right = element.location['x'] + element.size['width']
             # bottom = element.location['y'] + element.size['height']
-            left = 1475
-            top = 550
-            right = 1680
-            bottom = 605
+            # 登录页面 定位需要截图的元素
+            element = self.driver.find_element_by_xpath(
+                '//*[@id="app"]/div/div[2]/div[2]/div/div[2]/div[1]/div[2]/div[1]/div[1]/form/div[3]/div/div[2]/img')
+            img_data = element.get_attribute('src').split(',')[-1]
+            with open('./code/code.png', 'wb') as file:
+                img = base64.b64decode(img_data)
+                file.write(img)
         else:
             # 查询页面
-            left = 1165
-            top = 700
-            right = 1290
-            bottom = 745
+            # 截屏
+            # img = ImageGrab.grab()
+            # img.save('./code/button.png')
+            # 读取图片
+            im = Image.open('./code/button.png')
+            # 获取图片尺寸
+            # (width, height) = im.size
+            # 分辨率 1366 * 768
+            # left = int(width * 0.604)
+            # top = int(height * 0.805)
+            # right = left + 90
+            # bottom = top + 30
+            left = 775
+            top = 465
+            right = left + 90
+            bottom = top + 30
 
-        # 根据坐标位置拷贝
-        im = Image.open('./code/button.png')
-        im = im.crop((left, top, right, bottom))
-        im.save('./code/code.png')
+            # 根据坐标位置拷贝
+            im = im.crop((left, top, right, bottom))
+            im.save('./code/code.png')
 
     def spot_code(self, login=False, just_flag=False, balances=False):
         """
@@ -186,7 +205,7 @@ class Spider:
             print('打码平台验证码识别中...')
             # 判断登录还是查询
             if login:
-                rsp = fateadm_api.TestFunc(pred_type_id='30400')
+                rsp = fateadm_api.TestFunc(pred_type_id='304000003')
             else:
                 rsp = fateadm_api.TestFunc()
             if count > 3:
@@ -207,6 +226,12 @@ class Spider:
         while True:
             if count > 3:
                 return '暂无数据', '暂无数据'
+            # 打码错误关闭程序
+            if self.co > 3:
+                print('打码错误请重试，或联系开发者。')
+                self.driver.close()
+                monitor = Monitor()
+                monitor.kill()
             # 填写请求信息
             self.driver.get('https://amr.sz.gov.cn/aicmerout/jsp/gcloud/giapout/industry/aicmer/processpage/step_one.jsp?ywType=30')
             num = self.wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, '#regno')))
@@ -228,10 +253,11 @@ class Spider:
             try:
                 error_con = self.driver.find_element_by_xpath('//*[@class="layui-layer layui-layer-dialog  layer-anim"]/div[2]').text
                 print('错误信息：{}'.format(error_con))
-                if error_con == '验证码填写错误！':
+                if error_con == '图形验证码填写错误！':
                     # 退款
                     self.spot_code(just_flag=True)
                     count += 1
+                    self.co += 1
                     continue
                 elif error_con == '验证码失效！':
                     count += 1
@@ -261,7 +287,7 @@ class Spider:
                         return '暂无数据', '暂无数据'
                     co += 1
                     continue
-
+            self.co = 0  # 初始化打码错误计数
             # 提取数据
             print('数据加载中...')
             # time.sleep(5)
@@ -358,29 +384,29 @@ class Spider:
         # 根据坐标位置拷贝
         im = Image.open('./code/phone_page.png')
         if pre_type == 1:
-            phone_image = im.crop((445, 55, 595, 85))
-            number_image = im.crop((1325, 98, 1555, 123))
+            phone_image = im.crop((300, 60, 400, 80))
+            number_image = im.crop((885, 135, 1035, 155))
         elif pre_type == 2:
-            phone_image = im.crop((445, 160, 595, 190))
-            number_image = im.crop((1330, 48, 1560, 73))
+            phone_image = im.crop((300, 165, 400, 185))
+            number_image = im.crop((885, 85, 1035, 105))
         elif pre_type == 3:
-            phone_image = im.crop((445, 115, 595, 145))
-            number_image = im.crop((1325, 3, 1555, 28))
+            phone_image = im.crop((300, 335, 400, 355))
+            number_image = im.crop((885, 260, 1035, 280))
         elif pre_type == 4:
-            phone_image = im.crop((445, 140, 595, 170))
-            number_image = im.crop((1330, 38, 1560, 63))
+            phone_image = im.crop((300, 145, 400, 165))
+            number_image = im.crop((885, 75, 1035, 95))
         elif pre_type == 5:
-            phone_image = im.crop((1325, 193, 1555, 218))
+            phone_image = im.crop((885, 230, 1035, 250))
             phone_image.save('./code/phone.png')
             phone_img = Image.open('code/phone.png')
             phone = pytesseract.image_to_string(phone_img)
             return phone, 0
         elif pre_type == 6:
-            phone_image = im.crop((445, 75, 595, 105))
-            number_image = im.crop((1330, 53, 1560, 78))
+            phone_image = im.crop((300, 80, 400, 100))
+            number_image = im.crop((885, 90, 1035, 110))
         elif pre_type == 7:
-            phone_image = im.crop((445, 70, 595, 100))
-            number_image = im.crop((1325, 48, 1555, 73))
+            phone_image = im.crop((300, 75, 400, 95))
+            number_image = im.crop((885, 85, 1035, 105))
 
         phone_image.save('./code/phone.png')
         number_image.save('./code/number.png')
