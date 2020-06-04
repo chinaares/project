@@ -223,7 +223,6 @@ class Spider:
 
 if __name__ == '__main__':
     spider = Spider()
-    # spider.main(20)
-    for i in spider.get_model():
-        print(i)
+    spider.main(1)
+
 

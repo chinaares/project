@@ -15,6 +15,7 @@ from retrying import retry
 from multiprocessing import Pool
 from configparser import ConfigParser
 from fake_useragent import UserAgent
+from Sqlite_DB import DBTool
 
 
 print(os.path.abspath(__file__))  # 当前文件绝对路径
@@ -81,7 +82,7 @@ class Spider:
         cp = ConfigParser()  # 实例化
         cp.read(file, encoding='utf-8')  # 读取文件
         model = cp.get('Version', 'model')  # 读取数据
-        return model
+        return model.split(',')
 
     @retry(stop_max_attempt_number=30)
     def _parse_url(self, url):
@@ -119,7 +120,6 @@ class Spider:
             # 解析口碑详细数据
             for st in range(1, 11):
                 url = f'https://koubei.app.autohome.com.cn/autov9.1.0/alibi/seriesalibiinfos-pm2-ss{car}-st{st}-p{p}-s50-isstruct0-o0.json'
-
                 response = self._parse_url(url).json()
                 results = response.get('result').get('list')
                 for result in results:
@@ -173,12 +173,18 @@ class Spider:
         Interior_content = self.content[eid]['内饰']  # 内饰内容
         Costeffective_content = self.content[eid]['性价比']  # 性价比内容
 
-        data = [[userId, userName, model, specid, brandname, seriesname, specname, boughtprovincename, boughtcityname,
+        # data = [[userId, userName, model, specid, brandname, seriesname, specname, boughtprovincename, boughtcityname,
+        #          dealername, boughtdate, boughtPrice, actualOilConsumption, drivekilometer, satisfaction_content,
+        #          Dissatisfied_content, spaceScene, space_content, powerScene, power_content, maneuverabilityScene,
+        #          Control_content, oilScene, oilScene_content, comfortablenessScene, Comfort_content, apperanceScene,
+        #          Exterior_content, internalScene, Interior_content,
+        #          costefficientScene, Costeffective_content, purpose]]
+
+        data = (userId, userName, model, specid, brandname, seriesname, specname, boughtprovincename, boughtcityname,
                  dealername, boughtdate, boughtPrice, actualOilConsumption, drivekilometer, satisfaction_content,
                  Dissatisfied_content, spaceScene, space_content, powerScene, power_content, maneuverabilityScene,
                  Control_content, oilScene, oilScene_content, comfortablenessScene, Comfort_content, apperanceScene,
-                 Exterior_content, internalScene, Interior_content,
-                 costefficientScene, Costeffective_content, purpose]]
+                 Exterior_content, internalScene, Interior_content, costefficientScene, Costeffective_content, purpose)
         return data
 
     def keep_records(self, eid, vali=False):
@@ -197,6 +203,20 @@ class Spider:
             with open(file_name, 'a+') as f:
                 f.write(str(eid))
                 f.write('\n')
+
+    def save_sql(self, data):
+        """数据保存到数据库"""
+        sql = """INSERT INTO koubei ('用户ID', '用户姓名', '车系ID', '车型ID', '品牌名称', '车系名称', '购买车型', '购买地点(省)', '购买地点(市)',
+                                '购车经销商', '购买时间', '裸车购买价', '油耗(百公里)', '目前行驶', '满意内容', '不满意内容', '空间(评分)', '空间内容',
+                                '动力(评分)', '动力内容', '操控(评分)', '操控内容', '油耗(评分)', '油耗内容', '舒适性(评分)', '舒适性内容',
+                                '外观(评分)', '外观内容', '内饰(评分)', '内饰内容', '性价比(评分)', '性价比内容', '购车目的') VALUES 
+                              (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"""
+        # 连接数据库
+        db = DBTool()
+        i = db.execute(sql, data)
+        if not i:
+            log_init().info('数据插入失败')
+            return
 
     def scv_data(self, data):
         """保存数据"""
@@ -222,7 +242,8 @@ class Spider:
         # 第三步 获取口碑详情数据
         data = self.get_content(model, eid)
         # 第四步 保存数据
-        self.scv_data(data)
+        # self.scv_data(data)
+        self.save_sql(data)
         log_init().info(f'车系：{model} 口碑：{eid} 数据保存成功!')
         # 保存获取记录
         self.keep_records(eid)
@@ -233,20 +254,21 @@ class Spider:
         """程序入口"""
         # 多线程启动
         pool = Pool(num)
-        # 第一步 读取车型ID
-        model = self.red_ini()
-        # 第二步 获取口碑eid
-        for eid in self.get_eid(model):
-            # 启动线程
-            pool.apply_async(self.run, (model, eid,))
+        # 第一步 配置文件读取车型ID
+        models = self.red_ini()
+        for model in models:
+            # 第二步 获取口碑eid
+            for eid in self.get_eid(model):
+                # 启动线程
+                pool.apply_async(self.run, (model, eid,))
 
-        pool.close()
-        pool.join()
-        log_init().info(f'车系：{model} 口碑数据获取完成!')
+            pool.close()
+            pool.join()
+            log_init().info(f'车系：{model} 口碑数据获取完成!')
 
 
 if __name__ == '__main__':
     spider = Spider()
-    spider.main(10)
-    # spider.get_eid(4502)
-
+    # spider.main(1)
+    model = spider.red_ini()
+    print(model)
