@@ -1,0 +1,3 @@
+admin,admin
+stu1,19000001
+stu2,19000002
