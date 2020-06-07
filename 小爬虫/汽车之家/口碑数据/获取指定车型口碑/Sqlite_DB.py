@@ -41,6 +41,7 @@ class DBTool(object):
             self.cursor.execute(
                 """create table if not EXISTS koubei
                   (id integer primary key, 
+                  eid INT(50),
                   用户ID INT(50), 
                   用户姓名 CHAR(255), 
                   车系ID INT(50), 

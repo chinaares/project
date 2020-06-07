@@ -41,6 +41,7 @@ class DBTool(object):
             self.cursor.execute(
                 """create table if not EXISTS koubei
                   (id integer primary key, 
+                  eid INT(50),
                   用户ID INT(50), 
                   用户姓名 CHAR(255), 
                   车系ID INT(50), 
@@ -75,7 +76,6 @@ class DBTool(object):
                   性价比内容 text,
                   购车目的 text
                   )""")
-            print('koubei 表创建成功!')
 
     def close(self):
         """
@@ -120,13 +120,13 @@ class DBTool(object):
         查询语句
         sql：sql语句
         param：参数,可为None
-        retutn：成功返回True
+        retutn：True 有数据 False 没有数据
         """
-        if param is None:
-            self.cursor.execute(sql)
-        else:
-            self.cursor.execute(sql, param)
-        return self.cursor.fetchall()
+        content = self.cursor.execute(sql)
+        # print(content.fetchall())
+        if content.fetchall():
+            return True
+        return False
 
 
 if __name__ == '__main__':

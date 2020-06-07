@@ -632,4 +632,7 @@ class Spider:
 if __name__ == '__main__':
     spider = Spider()
     # spider.run()
-    spider.save_xls()
+    # spider.save_xls()
+    for i in spider.get_model():
+        brand_l, che_id, brand_n, car_l, car_n, model_l, model_n = i
+        print(model_l, model_n)
