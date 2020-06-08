@@ -620,19 +620,19 @@ class Spider:
             self.del_temporary_file()
             time.sleep(0.5)
 
-            count += 1
-            if count > 20:
-                return
-
-            print('*'*100)
+            # count += 1
+            # if count > 20:
+            #     return
+            #
+            # print('*'*100)
         # 第六步 读取数据文件 生成excel
-        # self.save_xls()
+        self.save_xls()
 
 
 if __name__ == '__main__':
     spider = Spider()
-    # spider.run()
-    # spider.save_xls()
-    for i in spider.get_model():
-        brand_l, che_id, brand_n, car_l, car_n, model_l, model_n = i
-        print(model_l, model_n)
+    spider.run()
+    # # spider.save_xls()
+    # for i in spider.get_model():
+    #     brand_l, che_id, brand_n, car_l, car_n, model_l, model_n = i
+    #     print(model_l, model_n)

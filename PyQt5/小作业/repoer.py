@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QLabel, QMessage
 class repoer(QWidget):
     def __init__(self):
         super(repoer, self).__init__()
-        self.resize(400, 500)
+        self.resize(400, 650)
         username = self.red_ini()
         self.setWindowTitle(username)
         # 标题
@@ -36,7 +36,16 @@ class repoer(QWidget):
         self.img_init()
 
     def name_init(self):
-        self.name.setPlaceholderText("请输入500字学习心得总结:")
+        text = "学习报告:\n1.课程内容总结，首先，我们学到了对于程序的定义，理解了什么是程序？什么是程序设计的含义，然后通过编程应用python对一些简单的编程语言进行学习。" \
+               "在课程中，我们学习了python的基本数据类型，与python的input（）函数，和赋值运算符，逻辑运算符等基础函数的应用，并尝试编写了简易计算器的程序，" \
+               "与猜数字程序。在界面可视化的学习中，我们学会了利用窗体和按钮的建立与布局，制作了可视化的简易计算器与猜数字的小程序。在课程中，我们学会利用python建立可视化的界面，并实现部分简单功能的运行。\n" \
+               "2，课程学习心得六月初，对python的学习已三月有余，于计算机的运行程序，得以窥其一二，" \
+               "虽是管中窥豹知之甚少，但在课程的学习中亦是获益良多。于课上，得以理解程序语言的条理与逻辑性，这是我们艺术类专业所不具备的，这个过程即是利用感性思维去尝试理解理性秩序的过程。" \
+               "人的生活亦是如此，介乎于感性与理性间，思其秩序，辩其优劣，文理之别自是如此。故而“理“赋予文明进步，而”文”赋予文明以色彩。进而纳其逻辑为己用，亦为乐事。\n" \
+               "3，自己的专业如何与python结合视觉传达设计专业可以通过对python的简单了解，在其后设计UI交互的界面时，可更好地与编程人员进行沟通，以提高工作效率。"
+        # self.name.setPlaceholderText("请输入500字学习心得总结:")
+        self.name.setText(text)
+        # self.name.setText(text1)
 
     def img_init(self):
         self.img.setFixedSize(150, 200)

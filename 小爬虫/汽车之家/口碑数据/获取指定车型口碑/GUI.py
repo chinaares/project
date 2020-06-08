@@ -116,14 +116,14 @@ class CrawlWindow(QWidget):
         self.save_combobox.setText('查询本地数据')
         self.save_combobox.setEnabled(True)
         # TODO 查询本地数据信号槽
-        # self.save_combobox.clicked.connect(self.combobox_slot)
+        self.save_combobox.clicked.connect(self.combobox_btn_slot)
 
     def update_database_init(self):
         """更新数据库按钮 初始化配置"""
         self.update_database.setText('更新数据库')
         self.update_database.setEnabled(True)
         # TODO 启动爬虫
-        # self.update_database.clicked.connect(self.combobox_slot)
+        self.update_database.clicked.connect(self.update_database_btn_slot)
 
     def start_btn_init(self):
         """启动按钮 初始化配置"""
@@ -134,11 +134,11 @@ class CrawlWindow(QWidget):
 
     def table_init(self):
         """表格控件 配置"""
-        self.table.setColumnCount(33)
+        self.table.setColumnCount(34)
         self.table.setHorizontalHeaderLabels(['用户ID', '用户姓名', '车系ID', '车型ID', '品牌名称', '车系名称', '购买车型', '购买地点(省)', '购买地点(市)',
                                                 '购车经销商', '购买时间', '裸车购买价', '油耗(百公里)', '目前行驶', '满意内容', '不满意内容', '空间(评分)', '空间内容',
                                                 '动力(评分)', '动力内容', '操控(评分)', '操控内容', '油耗(评分)', '油耗内容', '舒适性(评分)', '舒适性内容',
-                                                '外观(评分)', '外观内容', '内饰(评分)', '内饰内容', '性价比(评分)', '性价比内容', '购车目的'])
+                                                '外观(评分)', '外观内容', '内饰(评分)', '内饰内容', '性价比(评分)', '性价比内容', '购车目的', 'eid'])
         # 设置水平方向表格为自适应的伸缩模式
         # self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
 
@@ -162,7 +162,7 @@ class CrawlWindow(QWidget):
 
     def model_id_init(self):
         """写入车型ID复选框 初始化配置"""
-        self.model_id.stateChanged.connect(self.combobox_slot)
+        self.model_id.stateChanged.connect(self.model_id_slot)
 
     def checkbox_init(self):
         """IP代理复选框 初始化配置"""
@@ -197,24 +197,32 @@ class CrawlWindow(QWidget):
         # 将布局应用到窗口
         self.setLayout(self.w_layout)
 
-    def start_btn_slot(self):
-        """程序启动 信号槽"""
+    def program_btn(self, program_name):
+        """程序启动"""
         # 判断添加关键词 按钮状态, True:可按，False:不可按。 isEnabled():返回控件状态
         if not self.model_id.isChecked():
-            self.log_browser.append('<font color="red">请填写关键词!!!</font>')
+            self.log_browser.append('<font color="red">请填写车型ID!!!</font>')
             return None
         self.btn_sound.play()
         self.log_browser.append('<font color="green">{}程序启动{}</font>'.format('*'*20, '*'*20))
         # 启动线程
+        self.worker.name = program_name
         self.worker.start()
         # self.finish_sound.play()
         # 初始化各个按钮状态
+        self.update_database.setEnabled(False)  # 更新数据库按钮
         self.price.setEnabled(False)  # 输入框
         self.save_combobox.setEnabled(False)  # 添加关键字按钮
         self.checkbox.setEnabled(False)  # IP代理复选框
         self.start_thread.setEnabled(False)  # 开启多线程复选框
         self.start_btn.setEnabled(False)  # 启动按钮
         self.stop.setEnabled(True)  # 暂停按钮
+
+    def start_btn_slot(self):
+        """启动按钮 信号槽"""
+        program_name = r'DatabaseQuery.py'
+        self.program_btn(program_name)
+
 
     def stop_slot(self):
         """暂停 信号槽"""
@@ -228,7 +236,7 @@ class CrawlWindow(QWidget):
         self.start_btn.setEnabled(True)  # 启动按钮
         self.stop.setEnabled(False)  # 暂停按钮
 
-    def combobox_slot(self):
+    def model_id_slot(self):
         """车系ID输入控件 信号槽"""
         # 取消选中时的设置
         if not self.model_id.isChecked():
@@ -253,13 +261,15 @@ class CrawlWindow(QWidget):
             return
         return words
 
-    def model_id_slot(self):
-        """写入车型ID复选框 信号槽"""
-        if self.model_id.isChecked():
-            self.log_browser.append('<font color="green">开启IP代理</font>')
-            return None
-        self.red_ini('Status', 'proxy', '0')
-        self.log_browser.append('<font color="red">关闭IP代理</font>')
+    def combobox_btn_slot(self):
+        """查询本地数据按钮 信号槽"""
+        program_name = r'DatabaseQuery.py'
+        self.program_btn(program_name)
+
+    def update_database_btn_slot(self):
+        """更新数据库按钮 信号槽"""
+        program_name = r'model_koubei.py'
+        self.program_btn(program_name)
 
     def checkbox_slot(self):
         """IP代理复选框 信号槽"""
@@ -287,13 +297,14 @@ class CrawlWindow(QWidget):
             self.checkbox.setEnabled(True)  # IP代理
             self.start_thread.setEnabled(True)  # 开启多线程复选框
             self.start_btn.setEnabled(True)  # 启动按钮
+            self.update_database.setEnabled(True)
             self.stop.setEnabled(False)  # 暂停按钮
 
     def set_log_slot(self, log):
         """添加输出控件显示内容 信号槽"""
         self.log_browser.append(log)
 
-    def set_table_slot(self, userId, userName, model, specid, brandname, seriesname, specname, boughtprovincename, \
+    def set_table_slot(self, userId, eid, userName, model, specid, brandname, seriesname, specname, boughtprovincename, \
             boughtcityname, dealername, boughtdate, boughtPrice, actualOilConsumption, drivekilometer, \
             satisfaction_content, Dissatisfied_content, spaceScene, space_content, powerScene, \
             power_content, maneuverabilityScene, Control_content, oilScene, oilScene_content, \
@@ -331,10 +342,11 @@ class CrawlWindow(QWidget):
         self.table.setItem(row, 26, QTableWidgetItem(apperanceScene))
         self.table.setItem(row, 27, QTableWidgetItem(Exterior_content))
         self.table.setItem(row, 28, QTableWidgetItem(internalScene))
-        self.table.setItem(row, 30, QTableWidgetItem(Interior_content))
-        self.table.setItem(row, 31, QTableWidgetItem(costefficientScene))
-        self.table.setItem(row, 32, QTableWidgetItem(Costeffective_content))
-        self.table.setItem(row, 33, QTableWidgetItem(purpose))
+        self.table.setItem(row, 29, QTableWidgetItem(Interior_content))
+        self.table.setItem(row, 30, QTableWidgetItem(costefficientScene))
+        self.table.setItem(row, 31, QTableWidgetItem(Costeffective_content))
+        self.table.setItem(row, 32, QTableWidgetItem(purpose))
+        self.table.setItem(row, 33, QTableWidgetItem(eid))
 
     def set_start_slot(self):
         """输出框窗口清空 信号槽"""
@@ -365,11 +377,12 @@ class CrawlWindow(QWidget):
 
 
 class MyThread(QThread):
-    result_signal = pyqtSignal(str, str, str, str, str, str, str, str, str, str, str, str, str, str, str, str, str, str,
+    result_signal = pyqtSignal(str, str, str, str, str, str, str, str, str, str, str, str, str, str, str, str, str, str, str,
                                str, str, str, str, str, str, str, str, str, str, str, str, str, str, str)
     log_signal = pyqtSignal(str)
     start_q = pyqtSignal(bool)
     stop = False  # 是否终止程序
+    name = None
 
     def __init__(self):
         super(MyThread, self).__init__()
@@ -388,7 +401,7 @@ class MyThread(QThread):
         try:
             self.stop = False
             self.start_q.emit(True)
-            r = subprocess.Popen(['python', r'DatabaseQuery.py'],  # 需要执行的文件路径
+            r = subprocess.Popen(['python', self.name],  # 需要执行的文件路径
                                  stdout=subprocess.PIPE,
                                  stderr=subprocess.STDOUT,
                                  bufsize=0)
@@ -422,16 +435,16 @@ class MyThread(QThread):
     def log_data(self, line):
         # 筛选数据
         if 'content' in line:
-            print(len(eval(line.replace('content:', ''))))
+            # print(len(eval(line.replace('content:', ''))))
             content = [str(i) for i in eval(line.replace('content:', ''))]
-            ID, userId, userName, model, specid, brandname, seriesname, specname, boughtprovincename, \
+            ID, eid, userId, userName, model, specid, brandname, seriesname, specname, boughtprovincename, \
             boughtcityname, dealername, boughtdate, boughtPrice, actualOilConsumption, drivekilometer, \
             satisfaction_content, Dissatisfied_content, spaceScene, space_content, powerScene, \
             power_content, maneuverabilityScene, Control_content, oilScene, oilScene_content, \
             comfortablenessScene, Comfort_content, apperanceScene, Exterior_content, internalScene, \
             Interior_content, costefficientScene, Costeffective_content, purpose = content
 
-            self.result_signal.emit(str(userId), userName, model, specid, brandname, seriesname, specname, boughtprovincename, \
+            self.result_signal.emit(userId, eid, userName, model, specid, brandname, seriesname, specname, boughtprovincename, \
             boughtcityname, dealername, boughtdate, boughtPrice, actualOilConsumption, drivekilometer, \
             satisfaction_content, Dissatisfied_content, spaceScene, space_content, powerScene, \
             power_content, maneuverabilityScene, Control_content, oilScene, oilScene_content, \
@@ -441,6 +454,7 @@ class MyThread(QThread):
 
         # 把管道输出内容传递给显示控件,在GUI界面中显示出来
         self.log_signal.emit(line)
+
 
 def read_qss(style):
     file = QFile(style)

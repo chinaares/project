@@ -27,12 +27,15 @@ class DatabaseQuery(object):
     def run(self):
         models = self.red_ini()
         for model in models:
-            sql = """SELECT * FROM "koubei" WHERE "eid" = "{0}";""".format(model)
+            sql = """SELECT * FROM "koubei" WHERE "车系ID" = "{0}";""".format(model)
             print(sql)
             contents = self.db.query(sql)
-            if contents:
+            if not contents:
                 print(f'没有查询到车系：{model}相关数据!')
                 return False
+            print(f'成功查询到：{len(contents)}条数据。')
+            for content in contents:
+                print(f'content:{content}')
             return True
 
 
