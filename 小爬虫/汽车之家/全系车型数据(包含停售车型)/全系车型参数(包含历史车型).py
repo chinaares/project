@@ -41,7 +41,7 @@ class Spider:
         headers = {"User-Agent": UserAgent().random}
         while True:
             try:
-                # allow_redirects关闭页面跳转
+                # allow_redirects 禁止重定向 重定向太多会报错
                 response = requests.get(url, headers=headers, allow_redirects=False, timeout=300)
             except Exception as e:
                 print(e)

@@ -32,11 +32,17 @@ class DatabaseQuery(object):
             contents = self.db.query(sql)
             if not contents:
                 print(f'没有查询到车系：{model}相关数据!')
+                # 关闭数据库连接
+                print('关闭数据库连接')
+                self.db.close()
                 return False
             print(f'成功查询到：{len(contents)}条数据。')
             for content in contents:
                 print(f'content:{content}')
-            return True
+        # 关闭数据库连接
+        print('关闭数据库连接')
+        self.db.close()
+        return True
 
 
 if __name__ == '__main__':

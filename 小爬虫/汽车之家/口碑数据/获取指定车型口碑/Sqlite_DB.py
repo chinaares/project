@@ -82,8 +82,10 @@ class DBTool(object):
         """
         关闭数据库
         """
-        self.conn.close()
+        # 关闭游标
         self.cursor.close()
+        # 关闭连接
+        self.conn.close()
 
     def execute(self, sql, param=None):
         """

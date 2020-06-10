@@ -42,21 +42,21 @@ def getQRcode():
     print('支付二维码保存成功!')
 
 
-def test():
-    url = 'http://www.dongdongmeiche.cn/ceshi'  # django api路径
-    headers = {  # 请求头 是浏览器正常的就行 就这里弄了一天 - -！
-        'User-agent': 'none/ofyourbusiness',
-        'Spam': 'Eggs'
-    }
-    parms = {
-        'order_id': '2020052323563298218',  # 订单号
-        'money': '5.18',  # 订单金额
-        'trxday': '20200523',  # 交易日期
-        'trxstatus': '0000',  # 0000表示成功 3XXXX交易失败
-        'trxresult': '交易成功',  # 交易结果
-        }
-    resp = requests.post(url, data=parms, headers=headers).json()
-    print(resp)
+# def test():
+#     url = 'http://www.dongdongmeiche.cn/ceshi'  # django api路径
+#     headers = {  # 请求头 是浏览器正常的就行 就这里弄了一天 - -！
+#         'User-agent': 'none/ofyourbusiness',
+#         'Spam': 'Eggs'
+#     }
+#     parms = {
+#         'order_id': '2020052323563298218',  # 订单号
+#         'money': '5.18',  # 订单金额
+#         'trxday': '20200523',  # 交易日期
+#         'trxstatus': '0000',  # 0000表示成功 3XXXX交易失败
+#         'trxresult': '交易成功',  # 交易结果
+#         }
+#     resp = requests.post(url, data=parms, headers=headers).json()
+#     print(resp)
 
 
 if __name__ == '__main__':
