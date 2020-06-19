@@ -10,6 +10,7 @@ import hashlib
 import requests
 
 
+
 def getQRcode():
     """请求支付二维码"""
     # 接口地址
