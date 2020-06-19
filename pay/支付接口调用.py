@@ -8,7 +8,7 @@ import random
 import datetime
 import hashlib
 import requests
-
+# mac weihu
 
 
 def getQRcode():
