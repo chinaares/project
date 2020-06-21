@@ -184,8 +184,11 @@ class Spider:
     def run(self):
         content = self.read_txt()
         print(content)
+
+        # 红包码
+        _url = f'https://p1.mscpay.cn/alipay_hongbao.php?user_id=2088832321510500&money=10&snumber='
         # 跳转到转账页面
-        _url = f'https://www.alipay.com/?appId=09999988&actionType=toAccount&goBack=NO&amount=&userId={content[1]}&memo='
+        # _url = f'https://www.alipay.com/?appId=09999988&actionType=toAccount&goBack=NO&amount=&userId={content[1]}&memo='
 
         # 跳转到支付宝账户页面
         # alipay = 'gta4qb@163.com'
@@ -227,4 +230,11 @@ class Spider:
 
 if __name__ == '__main__':
     spider = Spider()
-    spider.run()
+    # spider.run()
+
+    # 红包码制作 2020.06.21
+    spider.code_generate(f'http://mrw.so/6cmIDw')
+    # 图片处理
+    image_process = Picture()
+    image_process.text = '-红包码'
+    image_process.run()

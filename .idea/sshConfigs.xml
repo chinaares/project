@@ -3,6 +3,8 @@
   <component name="SshConfigs">
     <configs>
       <sshConfig authType="PASSWORD" host="127.0.0.1" id="9b4fb141-6f83-441c-be04-684564e4f080" port="1234" customName="django64" nameFormat="CUSTOM" />
+      <sshConfig authType="PASSWORD" host="127.0.0.1" id="04444fba-064d-4aa4-bcc5-9b9d3c6885ff" port="1234" customName="django64" nameFormat="CUSTOM" />
+      <sshConfig authType="PASSWORD" host="127.0.0.1" id="c8a539bf-6a7a-4c72-ae77-dbbead3593e5" port="1234" customName="django64" nameFormat="CUSTOM" />
     </configs>
   </component>
 </project>
